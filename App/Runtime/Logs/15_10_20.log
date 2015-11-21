@@ -1,0 +1,11 @@
+[ 2015-10-20T17:24:42+08:00 ] 192.168.159.1 /index.php/index.php?m=Order&a=createOrder
+INFO: [ app_begin ] --START--
+INFO: ReadHtmlCache Behavior ::run [ RunTime:0.000557s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.000590s ]
+NOTIC: [2] session_start(): open(/tmp/session/sess_da2mi5nr8t7dks8ta72kl9irb6, O_RDWR) failed: No such file or directory (2) /mnt/hgfs/thinkphp313/ThinkPHP/Common/functions.php 第 566 行.
+NOTIC: [8192] mysql_escape_string(): This function is deprecated; use mysql_real_escape_string() instead. /mnt/hgfs/thinkphp313/ThinkPHP/Lib/Driver/Db/DbMysql.class.php 第 336 行.
+NOTIC: [8192] mysql_escape_string(): This function is deprecated; use mysql_real_escape_string() instead. /mnt/hgfs/thinkphp313/ThinkPHP/Lib/Driver/Db/DbMysql.class.php 第 336 行.
+NOTIC: [8192] mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead /mnt/hgfs/thinkphp313/ThinkPHP/Lib/Driver/Db/DbMysql.class.php 第 55 行.
+SQL: INSERT INTO `ajia_order` (`order_no`,`pay_type`,`create_time`) VALUES ('597986165399',1,'2015-10-20 17:24:42') [ RunTime:0.009482s ]
+NOTIC: [8] Undefined index:  /mnt/hgfs/thinkphp313/ThinkPHP/Extend/Driver/Cache/CacheRedisGroup.class.php 第 51 行.
+

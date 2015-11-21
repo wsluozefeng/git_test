@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <foreach name="userInfo" item="data">
+        <if condition="$data['age'] egt 25">   <!-- 在if判断的condition中的foreach的item必须使用“$”符号，而在比较区间中的name，则不能使用“$”符号  -->
+            {$data['name']}已大于25岁<br>
+        <elseif condition="$data['age'] egt 18 "/>
+            {$data['name']}已成年了<br>
+        <else/>
+            {$data['name']}未成年<br>
+        </if>
+
+        <!--<egt name="data['age']" value="18">
+            {$data['name']}已成年了<br>
+            <else/>
+            {$data['name']}未成年<br>
+        </egt>-->
+
+    </foreach>
+
+    <br><br>
+    区间比较(不一定是整数的区间，也可以用于判断某个变量是否存在于某些数据段中)
+
+    <in name="num" value="$tmp"> 在区间 <else/> 不在区间 </in>
+    <br>
+    <between name="num" value="1,20">在1,20区间 <else/> 不在1,20区间 </between>
+
+    <br><br>
+    三元运算<br>
+    {$num > 10 ? "大于10" : "小于10"}
+
+    <br><br>
+    推荐使用的原生php代码：一种是：'<?php ?>'  另一种是：<php></php> （推荐使用这种）<br>
+
+    <php>echo $userInfo[1]['name']</php>
+
+
+</body>
+</html>

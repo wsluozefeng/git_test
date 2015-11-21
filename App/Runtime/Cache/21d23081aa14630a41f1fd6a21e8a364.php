@@ -1,0 +1,48 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="<?php echo ($domain); ?>/Static/Js/jquery.min.js"></script>
+    <title>订单列表</title>
+</head>
+<body>
+
+<img src="<?php echo ($domain); ?>/Static/Image/demo.png" />
+<br />
+<input type="radio" name="pay_type" value="1" checked /> 微信&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="pay_type" value="2" /> 银联&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br />
+<a href="javascript:;" id="js_to_buy">pay</a>
+
+<form accept-charset="UTF-8" name="payForm" id="payForm" action="<?php echo ($domain); ?>/index.php/pay/index" method="post" target="_blank">
+    <input  name="orderNo" type="hidden" value="">
+    <input name="token" type="hidden" value="">
+    <input name="payType" type="hidden" value="">
+</form>
+
+</body>
+<script type="text/javascript">
+
+    $("#js_to_buy").click(function(){
+        var payType = $("input[name=pay_type]:checked").val();
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            async: false,  //todo 设置成同步，支付窗口表单提交才不会被浏览器拦截
+            data: {payType:payType},
+            url: 'index.php?m=Order&a=createOrder',
+            success: function(result){
+                if( result.status == 1 ){
+                    $("input[name=orderNo]").val(result.data['order_no']);
+                    $("input[name=token]").val(result.data['token']);
+                    $("input[name=payType]").val(result.data['payType']);
+                    $('#payForm').submit();//打开支付窗口
+                }else{
+
+                }
+            }
+        });
+    });
+
+</script>
+</html>

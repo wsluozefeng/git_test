@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="App/Static/Js/jquery.min.js"></script>
+    <title>购物车</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <th>商品名称</th>
+            <th>价格</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>CK-秋款牛仔裤</td><td>10</td>
+            </tr>
+            <!--<tr>
+                <td>模型飞机</td><td>15</td>
+            </tr>-->
+        </tbody>
+    </table>
+
+    <div><a href="javascript:;" id="js_to_buy">结算</a></div>
+</body>
+<script>
+    $(function(){
+       $("#js_to_buy").click(function(){
+           var postData = { 'goodName': 'CK-秋款牛仔裤', 'price': 10 };
+           $.ajax({
+               type: 'POST',
+               dataType: 'json',
+               data: postData,
+               url: 'index.php?m=Order&a=createOrder',
+               success: function(result){
+                   if( result.status == 1 ){
+                       alert('success');
+                   }else{
+
+                   }
+               }
+           });
+       });
+    });
+</script>
+</html>
