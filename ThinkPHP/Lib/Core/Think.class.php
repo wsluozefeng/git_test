@@ -313,6 +313,10 @@ class Think {
     
     // 致命错误捕获
     static public function fatalError() {
+        //todo php进程的超时也会触发register_shutdown_function
+        /*$name = posix_getpid();
+        exec( "echo 'name is ********".$name."' >> /tmp/test.txt" );*/
+
         // 保存日志记录
         if(C('LOG_RECORD')) Log::save();
         if ($e = error_get_last()) {

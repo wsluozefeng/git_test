@@ -8,22 +8,80 @@
 
 class TestAction extends Action{
 
+    public function test2(){
+        $name = posix_getpid();
+        exec( "echo 'name is ".$name."' >> /tmp/test.txt" );
+        while(1){
+
+        }
+        exit;
+    }
+
+    public function test(){
+
+        //echo __FILE__;exit;
+        /*$uid = posix_getuid();
+        $info = posix_getpwuid( $uid );  //根据用户id获取用户数据，posix_getpwnam通过用户名获取用户数据
+        $info = posix_times();      //获取当前进程所在cup的使用情况
+        $info = posix_uname();  //获取系统的相关信息：名称、版本、内核等
+        echo posix_getgid();
+        echo posix_getegid();
+        var_dump($info);
+        exit;
+
+
+        $id = getmypid();
+        exec("ps -ef | grep ".$id, $result);
+        print_r($result);
+        echo get_current_user();
+        echo posix_getpid();
+        exit;*/
+        //$this->display();
+    }
+
+    /**
+     * 文件系统扩展：Fileinfo,不需要安装扩展，也不需要开启php.ini任何配置，5.3版本后默认开启
+     * =========即使是修改了文件的后缀名，该扩展依旧能够识别原始的mine类型==========
+     */
+    public function finfo_demo( $file = '' ){
+        $file  =  empty( $file ) ? '/home/web/111.png' : $file;  //todo 111.png是被修改了后缀扩展，原先是111.jpg的
+
+        //过程化
+        $finfo = finfo_open( FILEINFO_MIME_TYPE );  //todo 返回php内置的MIME类型,其实是一个魔数数据库文件描述符
+        $data  = finfo_file( $finfo, $file );       //todo 返回文件mine类型
+        $rel   = finfo_close($finfo);               //todo 只能关闭由过程化打开的句柄
+
+        //对象化
+        //$finfo = new finfo( FILEINFO_MIME_TYPE );
+        //$data  = $finfo->file( $file );
+        //$data  = $finfo->buffer( $file );
+
+        echo $data;
+        exit;
+
+        /*$fp = fopen( $file, 'rb' );
+        $con = fread( $fp, 2 );
+        fclose($fp);
+        $code = @unpack( 'C2chars', $con );
+        $mineFlag = $code['char1'].$code['char2'];  //通过读取文件二进制头部的2个字节，可得知mine类型
+        var_dump($mineFlag);
+        exit;*/
+
+    }
+
+    /**
+     * stream_context_create_demo的post处理函数
+     */
     public function stream_context_create_demo_callback(){
 
-
         $xmlstr   = file_get_contents("php://input");
-        print_r($xmlstr);exit;
-        $filename = "/data/web/".time().'.png';
-        if(file_put_contents($filename,$xmlstr))
-        {
+        $filename = "/home/web/123.jpg";  //文件必须存在才能写入
+        if(file_put_contents($filename,$xmlstr)){
             echo 'success';
-        }
-        else
-        {
+        }else{
             echo 'failed';
         }
-
-
+        exit;
 
         /*echo "post数组：<br />";
         print_r($_POST);
@@ -42,17 +100,20 @@ class TestAction extends Action{
     /**
      * 创建影响访问上下文的http流：stream_context_create()
      * I/O流中的输入流 php://input
+     * 利用php://input保存图片
      */
     public function stream_context_create_demo(){
-
+        //header("Content-type:image/jpeg");
         $url = "http://www.tp.com/index.php/Test/stream_context_create_demo_callback";
 
-        //$postData = 'is me=2&laibai=>kong';
-        $postData = file_get_contents('/data/web/dock.png');
+        //$postData = 'is me=2&laibai=>kong';              //该部分参数是用于验证$_POST与php://input流的区别
+        $postData = file_get_contents('/home/web/56.jpg'); //该部分是用于实现通过php://input保存图片
         $option = array(
             'http' => array(
                 'method'  => 'POST',
-                'header'  => "Content-type:application/x-www-form-urlencoded\r\n" . "Content-Length:".strlen( $postData )."\r\n" . "Cookie:name=123\r\n",
+                'header'  => "Content-type:application/x-www-form-urlencoded\r\n" .
+                    "Content-Length:".strlen( $postData )."\r\n" .
+                    "Cookie:name=123\r\nConnection: close\r\n\r\n",
                 'content' => $postData,
             ),
         );
@@ -92,7 +153,7 @@ class TestAction extends Action{
         readfile( 'php://filter/read=string.toupper|string.rot13/resource=/data/web/tmp/test.txt' );  //readfile函数直接将内容写入输出缓冲区，开启缓冲区控制函数ob_start禁止所有缓冲输出，为了捕捉当前的文件内容
         $con = ob_get_contents();
         ob_end_clean();
-        echo str_rot13( $con );  //string.rot13加密的内容，可用str_rot13函数解密
+        echo str_rot13( $con );  //todo string.rot13加密的内容，可用str_rot13函数解密
 
         exit;
         //todo 写入文件的内容通过过滤流进行处理
@@ -111,79 +172,128 @@ class TestAction extends Action{
      * 获取访问的响应头
      */
     public function get_headers_demo(){
-        $url = 'http://www.tp.com';
-        $tmp = get_headers( $url );
+        $url = 'http://www.tp.com/ajia.php';
+        $tmp = get_headers( $url ); //todo 用head的方法发送请求，一般用于判断url或者文件是否存在，返回的是一个http的response头数组，通过数组第一个元素就可以进行判断
         print_r($tmp);
-        //$http_response_header须在访问了url后才被赋值，例如curl、file_get_contents等
+        //todo $http_response_header须在访问了url后才被赋值，例如curl、file_get_contents等
         print_r($http_response_header);
 
         exit;
     }
 
-    public function test(){
+    /**
+     *  stream_socket_client_demo和fsockopen_demo的异步非阻塞模式访问
+     */
+    public function block_test(){
 
         ignore_user_abort(true);
         set_time_limit(0);
 
-        sleep(5);
+        sleep(5);  //TODO 延时5秒，如果是阻塞方式的请求，需要等候该5秒结束，非阻塞的话不需要
+
         $name = !$_REQUEST['name'] ? "******" : $_REQUEST['name'];
         //$age  = $_REQUEST['age'];
         exec( "echo 'name is ".$name."' >> /tmp/test.txt" );
+
         echo "-*-*-*-*";
         exit;
-
-        //echo __FILE__;exit;
-        /*$uid = posix_getuid();
-        $info = posix_getpwuid( $uid );  //根据用户id获取用户数据，posix_getpwnam通过用户名获取用户数据
-        $info = posix_times();      //获取当前进程所在cup的使用情况
-        $info = posix_uname();  //获取系统的相关信息：名称、版本、内核等
-        echo posix_getgid();
-        echo posix_getegid();
-        var_dump($info);
-        exit;
-
-
-        $id = getmypid();
-        exec("ps -ef | grep ".$id, $result);
-        print_r($result);
-        echo get_current_user();
-        echo posix_getpid();
-        exit;*/
-        //$this->display();
     }
 
+    /**
+     * 测试fsockopen_demo和stream_socket_client_demo的阻塞和非阻塞模式
+     */
+    public function fsockopen_blocking(){
+        echo time();
+        echo "<br>";
+        $this->fsockopen_demo();
+        $this->fsockopen_demo();  //todo 写入 /tmp/test.txt中的时间一样的，证明2次发起请求的时间是一样，这样就非阻塞模式了
+        //$this->stream_socket_client_demo();
+        //$this->stream_socket_client_demo();
+        echo "<br>";
+        echo time();
+        exit;
+    }
+
+    /**
+     * 异步非阻塞实现方式之一：stream_socket_client与fscokopen类似，都可实现非阻塞模式访问，但是前者属于socket流
+     */
+    public function stream_socket_client_demo(){
+        //$socketTransports = stream_get_transports();  //todo 查看当前php支持的socket的协议，针对的http协议对应的socket编程是tcp或者udp协议
+
+        $url     = "tcp://www.tp.com:80/index.php?m=Test&a=block_test&name=bady".date('Y-m-d H:i:s');
+        $info    = parse_url($url);
+        $theHost = $info['scheme']."://".$info['host'].":".$info['port'];
+        //print_r($theHost);exit;
+        $fp      = stream_socket_client( $theHost, $errno, $errstr, 30 );  //todo 这里的host参数必须是协议+主机+端口
+
+        if( !$fp ){
+            echo $errstr($errno);
+            exit();
+        }else{
+            //stream_set_blocking( $fp,0 );
+            $head  = "GET ".$info['path']."?".$info["query"]." HTTP/1.1\r\n";
+            $head .= "Host: ".$info['host']."\r\n";
+            $head .= "Connection: Close\r\n\r\n";  //响应完就断开
+
+            fwrite($fp, $head);
+        }
+
+    }
+
+    /**
+     * 异步非阻塞实现方式之二：fsockopen
+     */
     public function fsockopen_demo(){
 
-        $url = "http://www.tp.com/index.php?m=Test&a=test&name=yeah".date('Y-m-d H:i:s');
+        $url = "http://www.tp.com/index.php?m=Test&a=block_test&name=yeah".date('Y-m-d H:i:s');
 
         $info  = parse_url($url);
         $fp    = fsockopen($info["host"], 80, $errno, $errstr, 3);
         if( !$fp ){
-            die('fsockopen is failed');
+            echo $errstr($errno);
+            exit;
         }
 
-        stream_set_blocking( $fp,0 );
+        stream_set_blocking( $fp,0 );  //todo 设置成非阻塞模式？？？？目前貌似没起任何作用
+
         $head  = "GET ".$info['path']."?".$info["query"]." HTTP/1.1\r\n";
-        $head .= "Host: ".$info['host']."\r\n";
-        $head .= "Connection: Close\r\n\r\n";  //响应完就断开
+        $head .= "Host: ".$info['host']."\r\n"; //todo Host必须存在
+        $head .= "Connection: Close\r\n\r\n";   //响应完就断开
 
         fwrite($fp, $head);
 
+        //todo 不关心输出结果，只管请求了即可，这样才可以实现异步非阻塞，如果直接使用file_get_contents或者curl访问，会是阻塞的模式
 //        while (!feof($fp)){
-//            $line = fread($fp,128);  //不关心输出
-//            //echo $line;
+//            $line = fread($fp,1024);
+//            echo $line;
 //        }
 
         fclose($fp);
-
-        echo "--------get is over-----";
-
-        exit;
     }
 
+    /**
+     * 异步非阻塞实现方式之三：multi_curl
+     */
+    public function multi_curl_demo(){
+        $curl = new CurlHandle();
+        $arr  = array(
+            "http://www.tp.com/index.php?m=Test&a=block_test&name=yeah01*****".date('Y-m-d H:i:s'),
+            "http://www.tp.com/index.php?m=Test&a=block_test&name=yeah02*****".date('Y-m-d H:i:s')
+        );
+        $curl->rollingCurl($arr);
+    }
 
     /**
-     * 通过fastcgi_finish_request函数实现异步非阻塞
+     * 异步非阻塞实现方式之四：pcntl扩展，实现多进程，亦可实现异步非阻塞
+     */
+    public function pcntlFunction(){
+        //todo 通过pcntl_XXX系列函数使用多进程功能。注意：pcntl_XXX只能运行在php CLI（命令行）环境下，在web服务器环境下，会出现无法预期的结果，请慎用！
+        //todo 根目录下的pcntl.php和shouhu_process.php实现这部分逻辑
+        //exec( '/usr/local/php/bin/php /data/web/thinkphp/pcntl_bak.php ' );  //即使用这种方式来实现在cli方式下执行多进程，在浏览器运行还是无法达到预期效果
+    }
+
+    /**
+     * fastcgi_finish_request函数实现异步
      */
     public function fastcgi_finish_request_demo(){
         echo '这会显示<br>';
@@ -206,16 +316,6 @@ class TestAction extends Action{
     }
 
     /**
-     * 多进程pcntl扩展
-     */
-    public function pcntlFunction(){
-        //todo 通过pcntl_XXX系列函数使用多进程功能。注意：pcntl_XXX只能运行在php CLI（命令行）环境下，在web服务器环境下，会出现无法预期的结果，请慎用！
-        //todo 根目录下的pcntl.php和shouhu_process.php实现这部分逻辑
-        //exec( '/usr/local/php/bin/php /data/web/thinkphp/pcntl_bak.php ' );  //即使用这种方式来实现在cli方式下执行多进程，在浏览器运行还是无法达到预期效果
-    }
-
-
-    /**
      * 执行外部命令（Linux中的shell命令）
      */
     public function linuxFunction(){
@@ -229,9 +329,8 @@ class TestAction extends Action{
         print_r( readline_list_history() );
         exit;*/
 
-
-        exec("ps -ef | grep php-fpm | wc -l >> /tmp/php-fpm-worker.txt");
-        exit;
+        /*exec("ps -ef | grep php-fpm | wc -l >> /tmp/php-fpm-worker.txt");
+        exit;*/
 
         //执行linux命令的5个函数
         /*
@@ -240,11 +339,11 @@ class TestAction extends Action{
          * 这两个参数有点类似addslashes()的功能。
          * */
 
+        //todo 可实现异步非阻塞式开发，但是在并发大的情况下会出现过多进程的情况，每个popen产生一个php进程
         $handle = popen( '/usr/local/php/bin/php /data/tmp/a.php >> /data/tmp/log.txt 2>&1', 'r' ); //todo  对于执行数据的操作,在r（只读模式）下，该进程句柄必须有输出操作才能执行，例如添加“>> /data/tmp/log.txt 2>&1” 或者 “fread( $handle, 5000 )”
         //fread( $handle, 5000 );
         //$handle = popen( '/usr/local/php/bin/php /data/tmp/a.php', 'w' );  //todo 若在“w”方式下则不需要
         fclose($handle);
-
         exit;
 
         $task = "ping -c 3 www.youxi.com";
