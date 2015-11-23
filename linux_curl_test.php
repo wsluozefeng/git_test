@@ -10,6 +10,7 @@
 /**
  * 测试输入流php://input 与 $_POST
  */
+
 print_r($_POST);
 
 echo "<br>\n";
