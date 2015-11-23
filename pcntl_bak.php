@@ -16,7 +16,6 @@ if( $sapi != 'cli' ){
 }
 
 demo();
-
 function demo( $nums = 3 ){
     global $logPath;
     for ($i=0; $i<$nums; ++$i){
