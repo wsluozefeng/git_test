@@ -8,6 +8,7 @@
 
 demo( 'doSomething' );
 
+
 function doSomething( $param = array() ){
     exec( "echo '子进程pid为".$param['pid']."******' >> /tmp/test.txt" );
     exec( "ps -ef | grep ".$param['pid']." >> /tmp/test.txt  && echo '\n\n'  >> /tmp/test.txt " );
